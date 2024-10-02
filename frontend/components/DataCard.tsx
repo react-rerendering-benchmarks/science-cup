@@ -1,23 +1,24 @@
+import { memo } from "react";
 import React from "react";
 
 // Components
 import Card from "./Card";
-
 interface IProps {
   title: string;
   data?: undefined | number;
   unit?: string;
 }
-
-export default function DataCard({ title, data, unit }: IProps) {
+export default memo(function DataCard({
+  title,
+  data,
+  unit
+}: IProps) {
   //* When protein is not selected.
   if (data === undefined) {
-    return (
-      <Card>
+    return <Card>
         <h2 className="">{title}</h2>
         <span>-</span>
-      </Card>
-    );
+      </Card>;
   }
 
   //* When protein is selected.
@@ -26,14 +27,11 @@ export default function DataCard({ title, data, unit }: IProps) {
 
   // Add + or - prefix for polarization.
   let prefix = "";
-  title === "Polaryzacja" && roundedData > 0 ? (prefix = "+") : (prefix = "");
-
-  return (
-    <Card>
+  title === "Polaryzacja" && roundedData > 0 ? prefix = "+" : prefix = "";
+  return <Card>
       <h2 className="">{title}</h2>
 
       <span className="data-text">{`${prefix}${roundedData}
           ${unit ? ` ${unit}` : ""}`}</span>
-    </Card>
-  );
-}
+    </Card>;
+});
