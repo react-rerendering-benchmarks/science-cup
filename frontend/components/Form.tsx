@@ -1,3 +1,6 @@
+import { useRef } from "react";
+import { useCallback } from "react";
+import { memo } from "react";
 import React, { ChangeEvent, FormEvent, useEffect } from "react";
 import { useState } from "react";
 // Icons
@@ -5,42 +8,38 @@ import RightArrow from "./Icons/RightArrow";
 // Components
 import FileInput from "./FileInput";
 import TextInput from "./TextInput";
-
-export default function Form({ dataHandler }: any) {
+export default memo(function Form({
+  dataHandler
+}: any) {
   // States
   const [genomeString, setGenomeString] = useState<string>("");
-  const [genomeFile, setGenomeFile] = useState<any>(null);
+  const genomeFile = useRef<any>(null);
   // Handlers
   function submitHandler(e: any) {
     // Disable default behaviour.
     e.preventDefault();
     // Send data to index.
-    dataHandler(genomeString, genomeFile);
+    dataHandler(genomeString, genomeFile.current);
     resetInputs();
   }
 
   //Effects
   useEffect(() => {
-    if (genomeFile === null) return;
+    if (genomeFile.current === null) return;
     // Send data to index after file is uploaded.
-    dataHandler(genomeString, genomeFile);
+    dataHandler(genomeString, genomeFile.current);
     resetInputs();
-  }, [genomeFile]);
+  }, [genomeFile.current]);
   // Functions
   function resetInputs() {
-    setGenomeFile(null);
+    genomeFile.current = null;
     setGenomeString("");
   }
-  return (
-    <form onSubmit={submitHandler} className="flex flex-col items-center gap-4">
+  return <form onSubmit={submitHandler} className="flex flex-col items-center gap-4">
       {/* Text input. */}
-      <TextInput
-        value={genomeString}
-        handleChange={(newValue: string) => setGenomeString(newValue)}
-      />
+      <TextInput value={genomeString} handleChange={useCallback((newValue: string) => setGenomeString(newValue), [setGenomeString])} />
       <span className="text-xl text-gray-500">lub</span>
       {/* File input. */}
-      <FileInput uploadFileHandler={(newFile: any) => setGenomeFile(newFile)} />
-    </form>
-  );
-}
+      <FileInput uploadFileHandler={useCallback((newFile: any) => genomeFile.current = newFile, [setGenomeFile])} />
+    </form>;
+});
